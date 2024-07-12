@@ -11,11 +11,16 @@ def main(input_path):
     [Read the input file and return a list of output files]
     """
 
-    with open(input_path, encoding="utf-8") as f:
-        lines = f.readlines()  # read the file
-    print(lines)
-
+    
     return ["Octocat.png", "Octocat.png"]  # test output
+
+def retrieve_locations(filepath: str):
+    print("\n\n $$$$$ \n\n")
+    with open(filepath, encoding="utf-8") as f:
+        lines = f.readlines()  # read the file
+    separatedcoords = lines[1].split(",") # separates the coordinate values
+    n_coordinate = [{'lat': float(separatedcoords[0]), 'lon': float(separatedcoords[1].strip())}]
+    return n_coordinate
 
 
 if __name__ == "__main__":
