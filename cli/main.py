@@ -18,9 +18,16 @@ def retrieve_locations(filepath: str):
     print("\n\n $$$$$ \n\n")
     with open(filepath, encoding="utf-8") as f:
         lines = f.readlines()  # read the file
-    separatedcoords = lines[1].split(",") # separates the coordinate values
-    n_coordinate = [{'lat': float(separatedcoords[0]), 'lon': float(separatedcoords[1].strip())}]
-    return n_coordinate
+
+    locations = []
+
+    for line in lines[1:]:
+        separatedcoords = line.split(",") # separates the coordinate values
+        lat = float(separatedcoords[0].strip())
+        lon = float(separatedcoords[1].strip())
+        n_coordinate = {'lat': lat, 'lon': lon}
+        locations.append(n_coordinate)
+    return locations
 
 
 if __name__ == "__main__":
