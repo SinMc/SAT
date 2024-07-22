@@ -7,7 +7,8 @@
   "updateContentCommand": "cd ./server && pip install -r requirements.txt",
   "postCreateCommand": "",
   "postAttachCommand": {
-    "server": "cd ./server && flask --debug run"
+    // "server": "cd ./server && flask --debug run"
+    "test-watch": "ptw"
   },
   "portsAttributes": {
     "5000": {
