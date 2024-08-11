@@ -1,4 +1,6 @@
-from cli.main import retrieve_locations
+import pytest
+
+from cli.main import retrieve_locations, network_request
 
 def test_read_csv_file():
     # given
@@ -8,3 +10,8 @@ def test_read_csv_file():
     locations = retrieve_locations(filepath)
     # then
     assert locations == known_locations
+
+@pytest.mark.slow
+def test_test():
+    results = network_request()
+    assert results['severities']
