@@ -8,7 +8,7 @@
 
 <body>
     <h1>Data modelling climate risks</h1>
-    <p>This program takes latitude and longitude pairs in a document comma separated, no spaces, with a new line for each pair and outputs climate data for each location</p>
+    <p>This program takes latitude and longitude pairs in a document comma separated, no spaces, with a new line for each pair and outputs climate data for each location. Should include a header line.</p>
 
     <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept=".csv">
