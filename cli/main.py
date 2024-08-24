@@ -28,20 +28,23 @@ def format_output():
     for rcp in d:
         # print(rcp)
         r = d[rcp]
-        filtered = {k: v for k, v in r.items() if v !=None}
-        r.clear()
-        r.update(filtered)
+        r = {k: v for k, v in r.items() if v !=None}
+
         for hazard in r:
             # print(hazard)
             h = r[hazard]
             # print(h)
+            fig = plt.figure()  
+            fig.suptitle(hazard)
+
             for number in h:
                 # print(number)
                 n = h[number]
                 x = n.keys()
                 y = n.values()
                 plt.plot(x,y)
-    plt.savefig("graph.png")
+                
+            plt.savefig(f"graph {hazard}.png")
                 # print(n)
     # a = data["severities"]["rcp85"]["flood_riverine"]["500.0"]
     # x = a.keys()
