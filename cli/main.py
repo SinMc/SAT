@@ -30,28 +30,32 @@ def format_output():
         r = d[rcp]
         r = {k: v for k, v in r.items() if v !=None}
 
-        for hazard in r:
+        fig, axs = plt.subplots(len(r), sharex= True)
+
+        for i, hazard in enumerate(r):
             # print(hazard)
             h = r[hazard]
             # print(h)
-            fig = plt.figure()  
-            fig.suptitle(hazard)
+            fig.suptitle("Hazards")
+            fig.supxlabel("Year", va= "center")
+            fig.supylabel("Risk")
+            fig.legend(h, loc="outside right")
+            axs[i].set_box_aspect(0.17)
+            axs[i].set_title(hazard)
+            fig.subplots_adjust(hspace=0.5)
 
             for number in h:
                 # print(number)
                 n = h[number]
                 x = n.keys()
                 y = n.values()
-                plt.plot(x,y)
-                
-            plt.savefig(f"graph {hazard}.png")
-                # print(n)
-    # a = data["severities"]["rcp85"]["flood_riverine"]["500.0"]
-    # x = a.keys()
-    # y = a.values()
-    # plt.plot(x, y)
-    # plt.savefig("graph.png")
-    # return ["graph.png"]
+                axs[i].plot(x,y)
+
+            # print(counter)
+        plt.xticks(rotation=30)
+        fig.savefig(f"graph_{rcp}.png")
+
+    return ["graph.png"]
 
 
 
@@ -76,18 +80,12 @@ def network_request():
     api_token = os.environ.get("SEVERITIES_API_TOKEN")
     headers = {"Authorization": "Basic {}".format(api_token)}
 
-    # print("\n\n $$$$$ \n\n")
     response_json = []
     for location in locations:
         response = requests.post(url, data= json.dumps(location), headers= headers)
         response_json.append(response.json())
     # print(response_json)
     return response_json
-    # curl --request POST 
-    # --url https://api.climaterisk.qa/v1/severities 
-    # --header "Authorization: Basic $SEVERITIES_API_TOKEN" 
-    # --data "{\"coordinates\":{\"latitude\":-32.92874606286358,\"longitude\":151.7829704479731}}"
-    # --data '{"coordinates":{"latitude":-32.92874606286358,"longitude":151.7829704479731}}'
 
 
 if __name__ == "__main__":
