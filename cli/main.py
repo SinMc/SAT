@@ -20,40 +20,44 @@ def main(input_path):
 
 
 def format_output():
-    with open("./coord.json", "r") as f:
+    with open("./coordinate.json", "r") as f:
         data = json.load(f)
-    
-    d = data["severities"]
+    for loc in data:
+        newpath = str(loc["metadata"]["location"]["latitude"]) + ", " + str(loc["metadata"]["location"]["longitude"])
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
 
-    for rcp in d:
-        # print(rcp)
-        r = d[rcp]
-        r = {k: v for k, v in r.items() if v !=None}
+        d = loc["severities"]
 
-        fig, axs = plt.subplots(len(r), sharex= True)
+        for rcp in d:
+            # print(rcp)
+            r = d[rcp]
+            r = {k: v for k, v in r.items() if v !=None}
 
-        for i, hazard in enumerate(r):
-            # print(hazard)
-            h = r[hazard]
-            # print(h)
-            fig.suptitle("Hazards")
-            fig.supxlabel("Year", va= "center")
-            fig.supylabel("Risk")
-            fig.legend(h, loc="outside right")
-            axs[i].set_box_aspect(0.17)
-            axs[i].set_title(hazard)
-            fig.subplots_adjust(hspace=0.5)
+            fig, axs = plt.subplots(len(r), sharex= True)
 
-            for number in h:
-                # print(number)
-                n = h[number]
-                x = n.keys()
-                y = n.values()
-                axs[i].plot(x,y)
+            for i, hazard in enumerate(r):
+                # print(hazard)
+                h = r[hazard]
+                # print(h)
+                fig.suptitle("Hazards")
+                fig.supxlabel("Year", va= "center")
+                fig.supylabel("Risk")
+                fig.legend(h, loc="outside right")
+                axs[i].set_box_aspect(0.17)
+                axs[i].set_title(hazard)
+                fig.subplots_adjust(hspace=0.5)
 
-            # print(counter)
-        plt.xticks(rotation=30)
-        fig.savefig(f"graph_{rcp}.png")
+                for number in h:
+                    # print(number)
+                    n = h[number]
+                    x = n.keys()
+                    y = n.values()
+                    axs[i].plot(x,y)
+
+                # print(counter)
+            plt.xticks(rotation=30)
+            fig.savefig(newpath + f"/graph_{rcp}.png")
 
     return ["graph.png"]
 
