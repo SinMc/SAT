@@ -1,40 +1,42 @@
-"""
-[changeme]
-"""
 import os
 import folium.map
 import requests
 import sys
 import json
-import geopandas as gpd
 import matplotlib.pyplot as plt
-import numpy as np
 import csv
 import folium
 from PIL import Image
 import io
-import selenium
+import shutil
 
-filepath = './cli/test/fixtures/test.csv'
+output_folder = "output/"
 
 def main(input_path):
     locations = retrieve_locations(input_path)
     response = network_request(locations)
-    w_temp(response)
-    graph(response)
-    csvw(response)
+    folders = create_folders(response)
+    graph(response, folders)
+    csvw(response, folders)
     maps(locations)
+    zip_outputs()
 
+def zip_outputs():
+    shutil.make_archive(output_folder + "outputs", "zip", output_folder)
 
-def w_temp(response_json):
-    with open("coordinate.json", "w") as file: 
-         file.write(json.dumps(response_json))
-
-
-def reader():
-    with open("./coordinate.json", "r") as f:
-        data = json.load(f)
-    return data
+def create_folders(data):
+    shutil.rmtree(output_folder)
+    os.mkdir(output_folder)
+    folders = []
+    for loc in data:
+        d = loc["severities"]
+        name = output_folder + str(loc["metadata"]["location"]["latitude"]) + ", " + str(loc["metadata"]["location"]["longitude"])
+        folders.append(name)
+        os.makedirs(name)
+        for rcp in loc["severities"]:
+            f_rcp = name + f"/{rcp}"
+            os.makedirs(f_rcp)
+    return folders
 
 
 def maps(locations):
@@ -46,13 +48,12 @@ def maps(locations):
         folium.Marker(location=(location), icon=folium.Icon(icon="cloud")).add_to(map)
     map_data = map._to_png()
     img_map = Image.open(io.BytesIO(map_data))
-    img_map.save('Map.png')
+    img_map.save(output_folder + "Map.png")
 
 
-def csvw(data):
-    for loc in data:
+def csvw(data, folders):
+    for i, loc in enumerate(data):
         d = loc["severities"]
-        name = str(loc["metadata"]["location"]["latitude"]) + ", " + str(loc["metadata"]["location"]["longitude"])
 
         lst = []
         header = []
@@ -64,9 +65,9 @@ def csvw(data):
             for hazard in r:
                 h = r[hazard]
 
-                file_name = name + '/' + rcp + f'/{hazard}_risk.csv'
+                file_name = folders[i] + "/" + rcp + f"/{hazard}_risk.csv"
 
-                with open(file_name, 'w', newline='') as f:
+                with open(file_name, "w", newline="") as f:
                     writer = csv.writer(f)
 
                     for likelihood in h:
@@ -87,23 +88,15 @@ def csvw(data):
                         writer.writerow(lst)
                 
 
-
-
-def graph(data):
-    for loc in data:
-        newpath = str(loc["metadata"]["location"]["latitude"]) + ", " + str(loc["metadata"]["location"]["longitude"])
-        if not os.path.exists(newpath):
-            os.makedirs(newpath)
-
+def graph(data, folders):
+     for j, loc in enumerate(data):
         d = loc["severities"]
 
         for rcp in d:
             r = d[rcp]
             r = {k: v for k, v in r.items() if v !=None}
 
-            f_rcp = newpath + f"/{rcp}"
-            if not os.path.exists(f_rcp):
-                os.makedirs(f_rcp)
+            f_rcp = folders[j] + f"/{rcp}"
 
             fig, axs = plt.subplots(len(r), sharex= True)
 
@@ -125,7 +118,6 @@ def graph(data):
 
             plt.xticks(rotation=30)
             fig.savefig(f_rcp + "/graph.png")
-
 
 
 def retrieve_locations(filepath: str):
